@@ -17,7 +17,7 @@ class AuthRepository {
   ) async {
     try {
       final response = await dio.post(
-        "register",
+        "/register",
         data: {
           'username': userName,
           'emailId': userEmailId,
@@ -45,7 +45,7 @@ class AuthRepository {
   ) async {
     try {
       final response = await dio.post(
-        "login",
+        "/login",
         data: {'emailId': emailId, 'password': password},
       );
 
@@ -74,7 +74,7 @@ class AuthRepository {
   Future<ApiResponse<String>> forgotPassword(String email) async {
     try {
       final response = await dio.post(
-        "forgot-password",
+        "/forgot-password",
         data: {"emailId": email},
       );
 
@@ -92,7 +92,7 @@ class AuthRepository {
 
   Future<ApiResponse<String>> resendOtp(String email) async {
     try {
-      final response = await dio.post('resend-Otp', data: {"emailId": email});
+      final response = await dio.post('/resend-Otp', data: {"emailId": email});
 
       final data = response.data;
 
@@ -110,7 +110,7 @@ class AuthRepository {
   Future<ApiResponse<String>> verifyOtp(String email, String code) async {
     try {
       final response = await dio.post(
-        'verify-otp',
+        '/verify-otp',
         data: {"email": email, "otp": int.parse(code)},
       );
 
@@ -133,7 +133,7 @@ class AuthRepository {
   ) async {
     try {
       final response = await dio.post(
-        'reset-otp',
+        '/reset-otp',
         data: {
           "email": email,
           "password": password,
@@ -155,7 +155,7 @@ class AuthRepository {
 
   Future<ApiResponse<UserModel>> getCurrentUser() async {
     try {
-      final response = await dio.get("currentUser");
+      final response = await dio.get("/currentUser");
 
       final data = response.data;
 
@@ -172,7 +172,7 @@ class AuthRepository {
 
   Future<void> logout() async {
     try {
-      await dio.post("logOut");
+      await dio.post("/logOut");
       await storageService.deleteAccessToken();
       await storageService.deleteRefreshToken();
     } on DioException catch (e) {
