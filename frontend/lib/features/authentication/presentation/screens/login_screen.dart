@@ -3,13 +3,13 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:frontend/core/utils/app_messenger.dart';
 import 'package:frontend/core/utils/app_validators.dart';
+import 'package:frontend/core/widgets/custom_button.dart' show CustomElevatedButton;
 import 'package:frontend/features/authentication/presentation/bloc/auth_bloc.dart';
 import 'package:frontend/features/authentication/presentation/bloc/auth_event.dart';
 import 'package:frontend/features/authentication/presentation/bloc/auth_state.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/constants/app_constants.dart';
-import '../../../../core/widgets/custom_button.dart';
 import '../../../../core/widgets/custom_textfield.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -157,13 +157,15 @@ class _LoginScreenState extends State<LoginScreen> {
                                   ),
                                 ),
                                 SizedBox(height: 20),
-                      
+
                                 CustomElevatedButton(
-                                  onPressed: loginUser,
+                                  onPressed: state.status == Status.loading
+                                      ? null
+                                      : loginUser,
                                   text: "Login",
-                                  backgroundColor: Theme.of(
-                                    context,
-                                  ).primaryColor,
+                                  isLoading: state.status == Status.loading,
+                                  backgroundColor:
+                                      Theme.of(context).primaryColor,
                                 ),
                               ],
                             ),

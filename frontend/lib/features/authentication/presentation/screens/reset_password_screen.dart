@@ -120,18 +120,27 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                     ),
                   ),
                 ),
-                CustomElevatedButton(
-                  onPressed: () {
-                    context.read<AuthBloc>().add(
-                      ResetPasswordRequested(
-                        email: widget.email,
-                        password: passwordController.text.trim(),
-                        confirmPassword: confirmPasswordController.text.trim(),
-                      ),
+                BlocBuilder<AuthBloc, AuthState>(
+                  builder: (context, state) {
+                    final isLoading = state.status == Status.loading;
+                    return CustomElevatedButton(
+                      onPressed: isLoading
+                          ? null
+                          : () {
+                              context.read<AuthBloc>().add(
+                                    ResetPasswordRequested(
+                                      email: widget.email,
+                                      password: passwordController.text.trim(),
+                                      confirmPassword:
+                                          confirmPasswordController.text.trim(),
+                                    ),
+                                  );
+                            },
+                      text: "Continue",
+                      isLoading: isLoading,
+                      backgroundColor: Theme.of(context).primaryColor,
                     );
                   },
-                  text: "Continue",
-                  backgroundColor: Theme.of(context).primaryColor,
                 ),
               ],
             ),

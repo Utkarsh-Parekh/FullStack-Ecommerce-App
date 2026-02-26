@@ -101,22 +101,23 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       LogoutRequested event,
       Emitter<AuthState> emit,
       ) async {
-    emit(state.copyWith(status: Status.loading, isAuthenticated: false));
-
     try {
       await authRepository.logout();
 
       emit(state.copyWith(
-        status: Status.loaded,
-        isAuthenticated: false,
-        user: null,
-      ));
+          status: Status.loaded,
+          isAuthenticated: false,
+          user: null,
+          successMessage: "",
+          error: "",
+        ));
     } catch (e) {
       emit(state.copyWith(
-        status: Status.error,
-        isAuthenticated: false,
-        user: null,
-      ));
+          status: Status.error,
+          isAuthenticated: false,
+          user: null,
+          error: e.toString(),
+        ));
     }
   }
 

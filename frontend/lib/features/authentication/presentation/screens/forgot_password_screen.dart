@@ -95,19 +95,24 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                   ),
                   BlocBuilder<AuthBloc, AuthState>(
                     buildWhen: (previous, current) =>
-                        previous.isEmailValid != current.isEmailValid,
+                        previous.isEmailValid != current.isEmailValid ||
+                        previous.status != current.status,
                     builder: (context, state) {
+                      final isLoading = state.status == Status.loading;
+                      final canSubmit = state.isEmailValid && !isLoading;
+
                       return CustomElevatedButton(
-                        onPressed: state.isEmailValid
+                        onPressed: canSubmit
                             ? () {
                                 context.read<AuthBloc>().add(
-                                  ForgotPasswordRequested(
-                                    emailId: emailController.text.trim(),
-                                  ),
-                                );
+                                      ForgotPasswordRequested(
+                                        emailId: emailController.text.trim(),
+                                      ),
+                                    );
                               }
-                            : null, // disables button automatically
+                            : null,
                         text: "Send Code",
+                        isLoading: isLoading,
                         backgroundColor: Theme.of(context).primaryColor,
                       );
                     },

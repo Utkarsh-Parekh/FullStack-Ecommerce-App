@@ -143,22 +143,30 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                 ),
                                 SizedBox(height: 20),
                                 CustomElevatedButton(
-                                  onPressed: () {
-                                    FocusScope.of(context).unfocus();
-                                    if (_formKey.currentState!.validate()) {
-                                      context.read<AuthBloc>().add(
-                                        RegisterRequested(
-                                          username: nameController.text.trim(),
-                                          emailId: emailController.text.trim(),
-                                          password: passwordController.text.trim(),
-                                        ),
-                                      );
-                                    }
-                                  },
+                                  onPressed: state.status == Status.loading
+                                      ? null
+                                      : () {
+                                          FocusScope.of(context).unfocus();
+                                          if (_formKey.currentState!
+                                              .validate()) {
+                                            context.read<AuthBloc>().add(
+                                                  RegisterRequested(
+                                                    username: nameController
+                                                        .text
+                                                        .trim(),
+                                                    emailId: emailController.text
+                                                        .trim(),
+                                                    password: passwordController
+                                                        .text
+                                                        .trim(),
+                                                  ),
+                                                );
+                                          }
+                                        },
                                   text: "Create an Account",
-                                  backgroundColor: Theme.of(
-                                    context,
-                                  ).primaryColor,
+                                  isLoading: state.status == Status.loading,
+                                  backgroundColor:
+                                      Theme.of(context).primaryColor,
                                 ),
                               ],
                             ),
