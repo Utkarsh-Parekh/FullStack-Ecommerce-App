@@ -19,6 +19,6 @@ router.post('/reset-otp',resetPassword);
 
 router.post('/refresh-token',refreshToken);
 
-router.post('/logOut',logout);
+router.post('/logOut',authMiddleware, logout);
 
 module.exports = router;

@@ -1,38 +1,31 @@
 const jwt = require('jsonwebtoken');
 
-const authMiddleware = (req,res,next) => {
+const authMiddleware = (req, res, next) => {
+  const authHeader = req.headers.authorization || req.headers.Authorization;
 
-    let token;
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    return res.status(401).json({
+      message: 'Missing or invalid token. Authorization failed',
+    });
+  }
 
-    let authHeader = req.headers.Authorization || req.headers.authorization;
+  const token = authHeader.split(' ')[1];
 
-    
-    if(authHeader || authHeader.startsWith("Bearer")){
-        token = authHeader.split(" ")[1];
+  if (!token) {
+    return res.status(401).json({
+      message: 'Missing token. Authorization failed',
+    });
+  }
 
-        if(!token){
-            res.status(401).json({
-                message: "Missing Token...Autherization Failed"
-            })
-        }
-        try {
-           const decoded = jwt.verify(
-            token,
-            process.env.JWT_ACCESS_SECRET
-           ) 
-
-           req.user = decoded;
-           next()
-        } catch (error) {
-             res.status(401).json({
-                message: "Token is Expired"
-            })
-        }
-
-
-    }
-   
-}
-
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_ACCESS_SECRET);
+    req.user = decoded.user;
+    return next();
+  } catch (error) {
+    return res.status(401).json({
+      message: 'Token is expired or invalid',
+    });
+  }
+};
 
 module.exports = authMiddleware;
