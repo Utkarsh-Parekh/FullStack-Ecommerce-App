@@ -4,7 +4,8 @@ class StorageService {
   final FlutterSecureStorage _storage = const FlutterSecureStorage();
 
   static const _accessTokenKey = 'accessToken';
-  static const _refreshokenKey = 'refreshToken';
+  static const _refreshTokenKey = 'refreshToken';
+  static const _userKey = 'user';
 
   // Save token after login
   Future<void> saveAccessToken(String token) async {
@@ -17,12 +18,12 @@ class StorageService {
   }
 
   Future<void> saveRefreshToken(String token) async {
-    await _storage.write(key: _refreshokenKey, value: token);
+    await _storage.write(key: _refreshTokenKey, value: token);
   }
 
   // Get token
   Future<String?> getRefreshToken() async {
-    return await _storage.read(key: _refreshokenKey);
+    return await _storage.read(key: _refreshTokenKey);
   }
 
   // Delete token on logout
@@ -31,6 +32,19 @@ class StorageService {
   }
 
   Future<void> deleteRefreshToken() async {
-    await _storage.delete(key: _refreshokenKey);
+    await _storage.delete(key: _refreshTokenKey);
+  }
+
+  
+  Future<void> saveUserJson(String json) async {
+    await _storage.write(key: _userKey, value: json);
+  }
+
+  Future<String?> getUserJson() async {
+    return await _storage.read(key: _userKey);
+  }
+
+  Future<void> deleteUser() async {
+    await _storage.delete(key: _userKey);
   }
 }

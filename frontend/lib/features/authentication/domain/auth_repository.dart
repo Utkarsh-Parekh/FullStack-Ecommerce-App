@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'package:dio/dio.dart';
 import 'package:frontend/core/wrapper/api_exception_wrapper.dart';
 import 'package:frontend/core/wrapper/api_response_wrapper.dart';
@@ -56,6 +57,7 @@ class AuthRepository {
 
       await storageService.saveRefreshToken(user.refreshToken);
       await storageService.saveAccessToken(responseBody["accessToken"]);
+      await storageService.saveUserJson(jsonEncode(user.toMap()));
 
       print("💾 Saving token: ${user.refreshToken}");
       print("saving accessToken: ${responseBody["accessToken"]}");
@@ -159,8 +161,13 @@ class AuthRepository {
 
       final data = response.data;
 
+      final user = UserModel.fromJson(data["user"]);
+
+      // Keep a fresh copy of user data in secure storage.
+      await storageService.saveUserJson(jsonEncode(user.toMap()));
+
       return ApiResponse(
-        data: UserModel.fromJson(data["user"]),
+        data: user,
         message: "",
         statusCode: response.statusCode!,
         isSuccess: true,
@@ -175,6 +182,7 @@ class AuthRepository {
       await dio.post("/logOut");
       await storageService.deleteAccessToken();
       await storageService.deleteRefreshToken();
+      await storageService.deleteUser();
     } on DioException catch (e) {
      throw _handleDioError(e);
     }
@@ -182,6 +190,17 @@ class AuthRepository {
 
   Future<String?> getToken() async {
     return await storageService.getAccessToken();
+  }
+
+  Future<UserModel?> getCachedUser() async {
+    final json = await storageService.getUserJson();
+    if (json == null) return null;
+    try {
+      final map = jsonDecode(json) as Map<String, dynamic>;
+      return UserModel.fromJson(map);
+    } catch (_) {
+      return null;
+    }
   }
 }
 

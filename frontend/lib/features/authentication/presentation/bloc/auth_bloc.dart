@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'package:bloc/bloc.dart';
 import 'package:frontend/core/wrapper/api_exception_wrapper.dart';
-import 'package:frontend/features/authentication/data/user_model.dart';
 import 'package:frontend/features/authentication/domain/auth_repository.dart';
 
 import 'auth_event.dart';
@@ -127,23 +126,55 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   ) async {
     emit(state.copyWith(status: Status.loading));
 
-    try{
+    try {
+      final token = await authRepository.getToken();
+      if (token == null) {
+        emit(state.copyWith(
+          user: null,
+          isAuthenticated: false,
+          status: Status.loaded,
+        ));
+        return;
+      }
 
       final response = await authRepository.getCurrentUser();
       emit(state.copyWith(
         user: response.data,
         isAuthenticated: response.data!.isLoggedIn,
-        status: Status.loaded
+        status: Status.loaded,
       ));
-    }
-    catch(e){
+    } on UnauthorizedException catch (_) {
       emit(state.copyWith(
-
+        user: null,
+        isAuthenticated: false,
+        status: Status.loaded,
+      ));
+    } on ForbiddenException catch (_) {
+      emit(state.copyWith(
+        user: null,
+        isAuthenticated: false,
+        status: Status.loaded,
+      ));
+    } on ApiException catch (_) {
+      final cachedUser = await authRepository.getCachedUser();
+      if (cachedUser != null) {
+        emit(state.copyWith(
+          user: cachedUser,
+          isAuthenticated: true,
+          status: Status.loaded,
+        ));
+      } else {
+        emit(state.copyWith(
           isAuthenticated: false,
-          status: Status.error
+          status: Status.error,
+        ));
+      }
+    } catch (_) {
+      emit(state.copyWith(
+        isAuthenticated: false,
+        status: Status.error,
       ));
     }
-
   }
 
   FutureOr<void> _forgotPasswordRequested(

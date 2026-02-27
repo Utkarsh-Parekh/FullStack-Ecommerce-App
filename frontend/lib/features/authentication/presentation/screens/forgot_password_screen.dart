@@ -24,11 +24,26 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   final _formKey = GlobalKey<FormState>();
 
   @override
+  void initState() {
+    super.initState();
+    context.read<AuthBloc>().add(AuthReset());
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: SafeArea(
         child: BlocListener<AuthBloc, AuthState>(
+          listenWhen: (previous, current) {
+            if (previous.status == Status.loading && current.status == Status.loaded) {
+              return true;
+            }
+            if (current.status == Status.error) {
+              return true;
+            }
+            return false;
+          },
           listener: (context, state) {
             if (state.status == Status.loaded) {
               AppMessenger.success(state.successMessage);
